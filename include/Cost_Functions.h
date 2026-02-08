@@ -4,8 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
-
-using CostFunction = std::function<double(const std::vector<double>&)>;
+#include "EPC_Data.h"
 
 class Benchmarks {
 public:

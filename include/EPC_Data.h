@@ -4,6 +4,9 @@
 #include <vector>
 #include <iostream>
 #include <limits> 
+#include <functional> 
+
+using CostFunction = std::function<double(const std::vector<double>&)>;
 
 struct Penguin {
     std::vector<double> position; 
@@ -21,6 +24,8 @@ struct ProblemContext {
     double lowerBound;   
     double upperBound;   
     int maxIterations;   
+
+    CostFunction costFunction;
 
     
     ProblemContext(int dim, int pop, double lb, double ub, int maxIter)
