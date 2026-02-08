@@ -1,27 +1,28 @@
 #include <iostream>
-#include <vector>
 #include "EPC_Data.h"
-#include "Cost_Functions.h" 
+#include "Cost_Functions.h"
+#include "EPC_Population.h" 
 
 int main() {
     std::cout << "[System] EPC Optimizer Initializing..." << std::endl;
 
-    ProblemContext ctx(4, 4, -10.0, 10.0, 100);
     
+    ProblemContext ctx(4, 10, -100.0, 100.0, 100, OptimizationMode::Minimize);
     ctx.costFunction = Benchmarks::Sphere;
 
-    Penguin p(ctx.dimensions);
-    p.position = {2.0, 1.0, -1.0, 0.0}; 
     
-    p.heat = ctx.costFunction(p.position);
+    EPC_Population colony(ctx);
+    
+    
+    colony.initialize();
 
-    std::cout << "[Test] Context-Bound Heat Calculation: " << p.heat << std::endl;
+    
+    const Penguin& p1 = colony.getPenguin(0);
+    std::cout << "[Test] Penguin 0 Position: [" << p1.position[0] << ", " << p1.position[1] << ", " << p1.position[2] << ", " << p1.position[3] << "]" << std::endl;
+    std::cout << "[Test] Penguin 0 Initial Heat: " << p1.heat << std::endl;
 
-    if (p.heat == 6.0) {
-        std::cout << "[Success] Strategy pattern implemented correctly." << std::endl;
-    }
-    if (ctx.mode == OptimizationMode::Minimize) {
-        std::cout << "[Test] Optimization Mode: MINIMIZE" << std::endl;
+    if (p1.heat != std::numeric_limits<double>::max()) {
+        std::cout << "[Success] Population initialized and evaluated." << std::endl;
     }
 
     return 0;

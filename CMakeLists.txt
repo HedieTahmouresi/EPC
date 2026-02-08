@@ -11,6 +11,7 @@ include_directories(include)
 # Define source files
 set(SOURCES
     src/main.cpp
+    src/EPC_Population.cpp
 )
 
 # Create the executable
