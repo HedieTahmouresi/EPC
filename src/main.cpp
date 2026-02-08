@@ -20,6 +20,9 @@ int main() {
     if (p.heat == 6.0) {
         std::cout << "[Success] Strategy pattern implemented correctly." << std::endl;
     }
+    if (ctx.mode == OptimizationMode::Minimize) {
+        std::cout << "[Test] Optimization Mode: MINIMIZE" << std::endl;
+    }
 
     return 0;
 }

@@ -8,6 +8,11 @@
 
 using CostFunction = std::function<double(const std::vector<double>&)>;
 
+enum class OptimizationMode {
+    Minimize,
+    Maximize
+};
+
 struct Penguin {
     std::vector<double> position; 
     double heat;               
@@ -26,11 +31,12 @@ struct ProblemContext {
     int maxIterations;   
 
     CostFunction costFunction;
+    OptimizationMode mode;
 
     
-    ProblemContext(int dim, int pop, double lb, double ub, int maxIter)
+    ProblemContext(int dim, int pop, double lb, double ub, int maxIter, OptimizationMode m = OptimizationMode::Minimize)
         : dimensions(dim), populationSize(pop), 
-          lowerBound(lb), upperBound(ub), maxIterations(maxIter) {}
+          lowerBound(lb), upperBound(ub), maxIterations(maxIter), mode(m) {}
 };
 
 #endif 
