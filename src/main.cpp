@@ -1,19 +1,15 @@
 #include <iostream>
-#include <vector>
-#include <cmath>
-
-// We will add our headers here later
-// #include "Penguin.h"
-// #include "ProblemContext.h"
+#include "EPC_Data.h" 
 
 int main() {
-    std::cout << "[System] EPC Optimizer Project Initialized." << std::endl;
-    std::cout << "[System] Build Environment: Verified." << std::endl;
+    std::cout << "[System] EPC Optimizer Initializing..." << std::endl;
+
+    ProblemContext ctx(4, 4, -10.0, 10.0, 100);
+
+    Penguin p(ctx.dimensions);
     
-    // Placeholder for future logic
-    // ProblemContext ctx(Dimensions=4, Population=10);
-    // EPC_Optimizer optimizer(ctx);
-    // optimizer.run();
+    std::cout << "[Test] Penguin Created with " << p.position.size() << " dimensions." << std::endl;
+    std::cout << "[Test] Problem Context: Bounds [" << ctx.lowerBound << ", " << ctx.upperBound << "]" << std::endl;
 
     return 0;
 }
