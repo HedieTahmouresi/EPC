@@ -1,29 +1,24 @@
 #include <iostream>
 #include "EPC_Data.h"
-#include "Cost_Functions.h"
-#include "EPC_Population.h" 
+#include "EPC_Physics.h"
 
 int main() {
-    std::cout << "[System] EPC Optimizer Initializing..." << std::endl;
+    std::cout << "[System] Testing Physics Engine..." << std::endl;
 
-    
-    ProblemContext ctx(4, 10, -100.0, 100.0, 100, OptimizationMode::Minimize);
-    ctx.costFunction = Benchmarks::Sphere;
+    Penguin p1(4); 
+    p1.position = {2.0, 1.0, -1.0, 0.0}; 
 
-    
-    EPC_Population colony(ctx);
-    
-    
-    colony.initialize();
+    Penguin p3(4);
+    p3.position = {3.0, 2.0, 0.0, -1.0}; 
 
-    
-    const Penguin& p1 = colony.getPenguin(0);
-    std::cout << "[Test] Penguin 0 Position: [" << p1.position[0] << ", " << p1.position[1] << ", " << p1.position[2] << ", " << p1.position[3] << "]" << std::endl;
-    std::cout << "[Test] Penguin 0 Initial Heat: " << p1.heat << std::endl;
+    double dist = EPC_Physics::calculateDistance(p3, p1);
+    std::cout << "[Test] Distance Calculated: " << dist << std::endl;
+    std::cout << "[Expected] Distance: 2.0" << std::endl;
 
-    if (p1.heat != std::numeric_limits<double>::max()) {
-        std::cout << "[Success] Population initialized and evaluated." << std::endl;
-    }
+    double mu = 0.1;
+    double Q = EPC_Physics::calculateAttraction(dist, mu);
+    std::cout << "[Test] Attraction (Q): " << Q << std::endl;
+    std::cout << "[Expected] Attraction: ~0.8187" << std::endl;
 
     return 0;
 }

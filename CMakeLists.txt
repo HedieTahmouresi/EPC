@@ -12,6 +12,7 @@ include_directories(include)
 set(SOURCES
     src/main.cpp
     src/EPC_Population.cpp
+    src/EPC_Physics.cpp
 )
 
 # Create the executable
