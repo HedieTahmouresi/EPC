@@ -24,19 +24,27 @@ struct Penguin {
 };
 
 struct ProblemContext {
-    int dimensions;      
-    int populationSize;  
-    double lowerBound;   
-    double upperBound;   
-    int maxIterations;   
-
-    CostFunction costFunction;
-    OptimizationMode mode;
-
+    int dimensions;
+    int populationSize;
+    double lowerBound;
+    double upperBound;
+    int maxIterations;
     
-    ProblemContext(int dim, int pop, double lb, double ub, int maxIter, OptimizationMode m = OptimizationMode::Minimize)
+    OptimizationMode mode;
+    CostFunction costFunction;
+
+    double spiral_a;       
+    double spiral_b;       
+    double initial_mu;     
+    double initial_m;      
+    double cooling_factor; 
+
+    ProblemContext(int dim, int pop, double lb, double ub, int maxIter, 
+                   OptimizationMode m = OptimizationMode::Minimize)
         : dimensions(dim), populationSize(pop), 
-          lowerBound(lb), upperBound(ub), maxIterations(maxIter), mode(m) {}
+          lowerBound(lb), upperBound(ub), maxIterations(maxIter), mode(m),
+          spiral_a(1.0), spiral_b(0.5), 
+          initial_mu(0.05), initial_m(0.5), cooling_factor(0.99) {}
 };
 
 #endif 

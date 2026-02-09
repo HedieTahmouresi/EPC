@@ -9,12 +9,10 @@ private:
     ProblemContext ctx;
     EPC_Population colony;
 
-    double current_mu;  
-    double current_m;   
+    double current_mu;
+    double current_m;
 
-    const double spiral_a = 1.0;
-    const double spiral_b = 0.5;
-    const double cooling_factor = 0.99; 
+    bool isBetter(double val1, double val2) const;
 
 public:
     EPC_Optimizer(const ProblemContext& context);

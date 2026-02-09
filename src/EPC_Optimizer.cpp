@@ -10,6 +10,14 @@ EPC_Optimizer::EPC_Optimizer(const ProblemContext& context)
     current_m = 0.5;
 }
 
+bool EPC_Optimizer::isBetter(double val1, double val2) const {
+    if (ctx.mode == OptimizationMode::Minimize) {
+        return val1 < val2;
+    } else {
+        return val1 > val2;
+    }
+}
+
 void EPC_Optimizer::run() {
     std::cout << "[Optimizer] Starting Optimization..." << std::endl;
     
@@ -20,11 +28,11 @@ void EPC_Optimizer::run() {
         Penguin bestPenguin = getGlobalBest();
 
         if (t % 10 == 0) {
-            std::cout << "Iter " << t << " | Best Cost: " << bestPenguin.heat << std::endl;
+            std::cout << "Iter " << t << " | Best Heat: " << bestPenguin.heat << std::endl;
         }
 
         std::vector<Penguin>& birds = colony.getColony();
-        std::vector<Penguin> next_generation = birds; 
+        std::vector<Penguin> next_generation = birds;
 
         for (int i = 0; i < ctx.populationSize; ++i) {
             Penguin& current = birds[i];
@@ -36,7 +44,8 @@ void EPC_Optimizer::run() {
 
             next_generation[i].position = EPC_Physics::computeNewPosition(
                 current, bestPenguin, Q, 
-                spiral_a, spiral_b, current_m, ctx
+                ctx.spiral_a, ctx.spiral_b, 
+                current_m, ctx
             );
 
             next_generation[i].heat = ctx.costFunction(next_generation[i].position);
@@ -44,8 +53,8 @@ void EPC_Optimizer::run() {
 
         birds = next_generation;
 
-        current_mu *= cooling_factor;
-        current_m  *= cooling_factor;
+        current_mu *= ctx.cooling_factor;
+        current_m  *= ctx.cooling_factor;
     }
 
     Penguin finalBest = getGlobalBest();
@@ -64,7 +73,7 @@ Penguin EPC_Optimizer::getGlobalBest() const {
     double bestHeat = birds[0].heat;
 
     for (size_t i = 1; i < birds.size(); ++i) {
-        if (birds[i].heat < bestHeat) {
+        if (isBetter(birds[i].heat, bestHeat)) {
             bestHeat = birds[i].heat;
             bestIdx = i;
         }
