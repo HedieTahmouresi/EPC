@@ -7,7 +7,7 @@ int main() {
     std::cout << "[System] Testing Determinism..." << std::endl;
 
     // 1. Setup Context with FIXED SEED (e.g., 12345)
-    ProblemContext ctx(10, 20, -5.12, 5.12, 100, OptimizationMode::Minimize, 12345);
+    ProblemContext ctx(10, 20, -5.12, 5.12, 200, OptimizationMode::Minimize, 12345);
     ctx.costFunction = Benchmarks::Sphere;
 
     // ---------------------------------------------------------
