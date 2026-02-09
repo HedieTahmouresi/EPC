@@ -27,9 +27,8 @@ void EPC_Optimizer::run() {
         
         Penguin bestPenguin = getGlobalBest();
 
-        if (t % 10 == 0) {
-            std::cout << "Iter " << t << " | Best Heat: " << bestPenguin.heat << std::endl;
-        }
+        std::cout << "Iter " << t << " | Best Heat: " << bestPenguin.heat << std::endl;
+        
 
         std::vector<Penguin>& birds = colony.getColony();
         std::vector<Penguin> next_generation = birds;

@@ -15,7 +15,13 @@ double EPC_Physics::calculateDistance(const Penguin& p1, const Penguin& p2) {
 }
 
 double EPC_Physics::calculateAttraction(double distance, double mu) {
-    return std::exp(-mu * distance);
+    double d = std::max(distance, 1e-10);
+    double raw_attraction = (std::exp(-mu * d)) / d;
+    if (raw_attraction > 1.0) {
+        return 1.0 / (1.0 + raw_attraction);
+    } else {
+        return raw_attraction;
+    }
 }
 
 std::pair<double, double> EPC_Physics::computeSpiralPair(
@@ -42,36 +48,29 @@ std::vector<double> EPC_Physics::computeNewPosition(
     const ProblemContext& ctx
 ) {
     size_t D = ctx.dimensions;
-    std::vector<double> position_sums(D, 0.0);
-    std::vector<int> position_counts(D, 0);
+    std::vector<double> final_position(D);
 
-    for (size_t i = 0; i < D; ++i) {
-        for (size_t j = i + 1; j < D; ++j) {
-            std::pair<double, double> curr_pair = {current.position[i], current.position[j]};
-            std::pair<double, double> target_pair = {best.position[i], best.position[j]};
-            
-            std::pair<double, double> new_pair = computeSpiralPair(curr_pair, target_pair, Q, a, b);
+    for (size_t i = 0; i < D - 1; i += 2) {
+        size_t j = i + 1;
 
-            position_sums[i] += new_pair.first;
-            position_counts[i]++;
-            
-            position_sums[j] += new_pair.second;
-            position_counts[j]++;
-        }
+        std::pair<double, double> curr_pair = {current.position[i], current.position[j]};
+        std::pair<double, double> target_pair = {best.position[i], best.position[j]};
+        
+        std::pair<double, double> new_pair = computeSpiralPair(curr_pair, target_pair, Q, a, b);
+
+        final_position[i] = new_pair.first;
+        final_position[j] = new_pair.second;
     }
 
-    std::vector<double> final_position(D);
-    
+    if (D % 2 != 0) {
+        size_t last = D - 1;
+        final_position[last] = current.position[last] + Q * (best.position[last] - current.position[last]);
+    }
+
     std::mt19937 rng(std::random_device{}());
     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
 
     for (size_t d = 0; d < D; ++d) {
-        if (position_counts[d] > 0) {
-            final_position[d] = position_sums[d] / position_counts[d];
-        } else {
-            final_position[d] = current.position[d];
-        }
-
         double u = dist_u(rng);
         final_position[d] += mutation_m * u;
 
