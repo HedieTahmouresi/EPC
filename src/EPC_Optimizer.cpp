@@ -59,22 +59,16 @@ void EPC_Optimizer::run() {
             for (int k = g; k < endIdx; ++k) {
                 int p_idx = indices[k];
                 Penguin& current = birds[p_idx];
-
-                // CASE 1: GLOBAL KING (The Top Boss)
-                // If this specific penguin happens to be the Global King
-                // (Note: We compare heats/IDs to be sure)
                 if (current.heat == globalBest.heat) {
-                    // Strategy: "Just a little bit mutation"
                     std::vector<double> mutated_pos = current.position;
                     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
                     
                     for (double& val : mutated_pos) {
-                        val += current_m * dist_u(ctx.rng); // Tiny wiggle
+                        val += current_m * dist_u(ctx.rng);
                         if(val > ctx.upperBound) val = ctx.upperBound;
                         if(val < ctx.lowerBound) val = ctx.lowerBound;
                     }
 
-                    // Only move if improved (Greedy)
                     if (isBetter(ctx.costFunction(mutated_pos), current.heat)) {
                         next_generation[p_idx].position = mutated_pos;
                         next_generation[p_idx].heat = ctx.costFunction(mutated_pos);
@@ -84,15 +78,10 @@ void EPC_Optimizer::run() {
                     continue; 
                 }
 
-                // CASE 2: LOCAL KING (Leader of this group, but not Global Best)
                 if (p_idx == localBestIdx) {
-                    // Strategy: Move towards GLOBAL KING
-                    // This pulls the whole group towards the global valley
-                    double dist = EPC_Physics::calculateDistance(current, globalBest);
-                    double Q = EPC_Physics::calculateAttraction(dist, current_mu);
 
                     next_generation[p_idx].position = EPC_Physics::computeNewPosition(
-                        current, globalBest, Q, 
+                        current, globalBest, current_mu, 
                         ctx.spiral_a, ctx.spiral_b, 
                         current_m, ctx
                     );
@@ -100,13 +89,9 @@ void EPC_Optimizer::run() {
                     continue;
                 }
 
-                // CASE 3: COMMONER (Standard Penguin)
-                // Strategy: Move towards LOCAL KING
-                double dist = EPC_Physics::calculateDistance(current, localKing);
-                double Q = EPC_Physics::calculateAttraction(dist, current_mu);
 
                 next_generation[p_idx].position = EPC_Physics::computeNewPosition(
-                    current, localKing, Q, 
+                    current, localKing, current_mu, 
                     ctx.spiral_a, ctx.spiral_b, 
                     current_m, ctx
                 );

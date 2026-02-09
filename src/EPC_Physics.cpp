@@ -24,13 +24,23 @@ double EPC_Physics::calculateAttraction(double distance, double mu) {
     }
 }
 
+double calculateSpiralDistance(double theta_i, double theta_j, double a, double b) {
+    double factor = (a / b) * std::sqrt(b * b + 1.0);
+    double diff = std::abs(std::exp(b * theta_j) - std::exp(b * theta_i));
+    return factor * diff;
+}
+
 std::pair<double, double> EPC_Physics::computeSpiralPair(
     std::pair<double, double> current, 
     std::pair<double, double> target, 
-    double Q, double a, double b
+    double mu, double a, double b
 ) {
     double theta_i = std::atan2(current.second, current.first);
     double theta_j = std::atan2(target.second, target.first);
+
+    double dist = calculateSpiralDistance(theta_i, theta_j, a, b);
+
+    double Q = calculateAttraction(dist, mu);
 
     double term1 = (1.0 - Q) * std::exp(b * theta_i);
     double term2 = Q * std::exp(b * theta_j);
@@ -44,7 +54,7 @@ std::pair<double, double> EPC_Physics::computeSpiralPair(
 
 std::vector<double> EPC_Physics::computeNewPosition(
     const Penguin& current, const Penguin& best, 
-    double Q, double a, double b, double mutation_m,
+    double mu, double a, double b, double mutation_m,
     // const ProblemContext& ctx // completely random
     ProblemContext& ctx // random with seed
 ) {
@@ -57,7 +67,7 @@ std::vector<double> EPC_Physics::computeNewPosition(
         std::pair<double, double> curr_pair = {current.position[i], current.position[j]};
         std::pair<double, double> target_pair = {best.position[i], best.position[j]};
         
-        std::pair<double, double> new_pair = computeSpiralPair(curr_pair, target_pair, Q, a, b);
+        std::pair<double, double> new_pair = computeSpiralPair(curr_pair, target_pair, mu, a, b);
 
         final_position[i] = new_pair.first;
         final_position[j] = new_pair.second;
@@ -65,16 +75,18 @@ std::vector<double> EPC_Physics::computeNewPosition(
 
     if (D % 2 != 0) {
         size_t last = D - 1;
+        double dist = calculateDistance(current, best);
+        double Q = calculateAttraction(dist, mu);
         final_position[last] = current.position[last] + Q * (best.position[last] - current.position[last]);
     }
 
-    //std::mt19937 rng(std::random_device{}()); // completely random
+    std::mt19937 rng(std::random_device{}()); // completely random
     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
 
     for (size_t d = 0; d < D; ++d) {
         
-        //double u = dist_u(rng); // completely random
-        double u = dist_u(ctx.rng); // random with seed
+        double u = dist_u(rng); // completely random
+        //double u = dist_u(ctx.rng); // random with seed
         final_position[d] += mutation_m * u;
 
         if (final_position[d] > ctx.upperBound) final_position[d] = ctx.upperBound;

@@ -12,13 +12,13 @@ public:
     static std::pair<double, double> computeSpiralPair(
         std::pair<double, double> current, 
         std::pair<double, double> target,  
-        double Q, double a, double b
+        double mu, double a, double b
     );
 
     static std::vector<double> computeNewPosition(
         const Penguin& current, 
         const Penguin& best, 
-        double Q, 
+        double mu, 
         double a, 
         double b,
         double mutation_m, 
