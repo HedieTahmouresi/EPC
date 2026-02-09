@@ -16,12 +16,13 @@ double EPC_Physics::calculateDistance(const Penguin& p1, const Penguin& p2) {
 
 double EPC_Physics::calculateAttraction(double distance, double mu) {
     double d = std::max(distance, 1e-10);
-    double raw_attraction = (std::exp(-mu * d)) / d;
-    if (raw_attraction > 1.0) {
-        return 1.0 / (1.0 + raw_attraction);
-    } else {
-        return raw_attraction;
-    }
+    double raw_attraction = (std::exp(-mu * d));
+    //if (raw_attraction > 1.0) {
+    //    return 1.0 / (1.0 + raw_attraction);
+    //} else {
+    //    return raw_attraction;
+    //}
+    return raw_attraction;
 }
 
 double calculateSpiralDistance(double theta_i, double theta_j, double a, double b) {
@@ -80,13 +81,13 @@ std::vector<double> EPC_Physics::computeNewPosition(
         final_position[last] = current.position[last] + Q * (best.position[last] - current.position[last]);
     }
 
-    std::mt19937 rng(std::random_device{}()); // completely random
+    //std::mt19937 rng(std::random_device{}()); // completely random
     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
 
     for (size_t d = 0; d < D; ++d) {
         
-        double u = dist_u(rng); // completely random
-        //double u = dist_u(ctx.rng); // random with seed
+        //double u = dist_u(rng); // completely random
+        double u = dist_u(ctx.rng); // random with seed
         final_position[d] += mutation_m * u;
 
         if (final_position[d] > ctx.upperBound) final_position[d] = ctx.upperBound;
