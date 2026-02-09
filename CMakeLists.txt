@@ -13,6 +13,7 @@ set(SOURCES
     src/main.cpp
     src/EPC_Population.cpp
     src/EPC_Physics.cpp
+    src/EPC_Optimizer.cpp
 )
 
 # Create the executable
