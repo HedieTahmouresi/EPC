@@ -36,7 +36,25 @@ void EPC_Optimizer::run() {
         for (int i = 0; i < ctx.populationSize; ++i) {
             Penguin& current = birds[i];
 
-            if (current.heat == bestPenguin.heat) continue;
+            if (current.heat == bestPenguin.heat) {
+                std::vector<double> mutated_pos = current.position;
+                std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
+    
+                for(double &val : mutated_pos) {
+                    val += current_m * dist_u(ctx.rng);
+                    if (val > ctx.upperBound) val = ctx.upperBound;
+                    if (val < ctx.lowerBound) val = ctx.lowerBound;
+                }
+                
+                double new_heat = ctx.costFunction(mutated_pos);
+                if (isBetter(new_heat, current.heat)) {
+                    next_generation[i].position = mutated_pos;
+                    next_generation[i].heat = new_heat;
+                } else {
+                    next_generation[i] = current; 
+                }
+                continue;
+            }
 
             double dist = EPC_Physics::calculateDistance(current, bestPenguin);
             double Q = EPC_Physics::calculateAttraction(dist, current_mu);
