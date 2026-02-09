@@ -2,9 +2,10 @@
 #include <iostream>
 
 EPC_Population::EPC_Population(const ProblemContext& context) 
-    : ctx(context), rng(std::random_device{}()) {
+    : ctx(context) //, rng(std::random_device{}()) // completely random
+    {
     penguins.reserve(ctx.populationSize);
-}
+    }
 
 void EPC_Population::initialize() {
     penguins.clear();
@@ -15,7 +16,8 @@ void EPC_Population::initialize() {
         Penguin p(ctx.dimensions);
         
         for (int d = 0; d < ctx.dimensions; ++d) {
-            double r = random_r(rng);
+            // double r = random_r(rng); // completely random
+            double r = random_r(ctx.rng); //random with seed 
             p.position[d] = ctx.lowerBound + r * (ctx.upperBound - ctx.lowerBound);
         }
         

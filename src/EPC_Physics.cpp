@@ -45,7 +45,8 @@ std::pair<double, double> EPC_Physics::computeSpiralPair(
 std::vector<double> EPC_Physics::computeNewPosition(
     const Penguin& current, const Penguin& best, 
     double Q, double a, double b, double mutation_m,
-    const ProblemContext& ctx
+    // const ProblemContext& ctx // completely random
+    ProblemContext& ctx // random with seed
 ) {
     size_t D = ctx.dimensions;
     std::vector<double> final_position(D);
@@ -67,11 +68,13 @@ std::vector<double> EPC_Physics::computeNewPosition(
         final_position[last] = current.position[last] + Q * (best.position[last] - current.position[last]);
     }
 
-    std::mt19937 rng(std::random_device{}());
+    //std::mt19937 rng(std::random_device{}()); // completely random
     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
 
     for (size_t d = 0; d < D; ++d) {
-        double u = dist_u(rng);
+        
+        //double u = dist_u(rng); // completely random
+        double u = dist_u(ctx.rng); // random with seed
         final_position[d] += mutation_m * u;
 
         if (final_position[d] > ctx.upperBound) final_position[d] = ctx.upperBound;

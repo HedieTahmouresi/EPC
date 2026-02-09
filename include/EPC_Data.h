@@ -5,6 +5,7 @@
 #include <iostream>
 #include <limits> 
 #include <functional> 
+#include <random>
 
 using CostFunction = std::function<double(const std::vector<double>&)>;
 
@@ -29,7 +30,7 @@ struct ProblemContext {
     double lowerBound;
     double upperBound;
     int maxIterations;
-    
+
     OptimizationMode mode;
     CostFunction costFunction;
 
@@ -39,12 +40,24 @@ struct ProblemContext {
     double initial_m;      
     double cooling_factor; 
 
+    int seed; // random with seed 
+    std::mt19937 rng; // random with seed
+
     ProblemContext(int dim, int pop, double lb, double ub, int maxIter, 
-                   OptimizationMode m = OptimizationMode::Minimize)
+                   OptimizationMode m = OptimizationMode::Minimize
+                   , int rndSeed = 42 // random with seed
+                ) 
         : dimensions(dim), populationSize(pop), 
           lowerBound(lb), upperBound(ub), maxIterations(maxIter), mode(m),
           spiral_a(1.0), spiral_b(0.5), 
-          initial_mu(0.05), initial_m(0.5), cooling_factor(0.99) {}
+          initial_mu(0.05), initial_m(0.5), cooling_factor(0.99) // {} // completely random
+          , seed(rndSeed) { // random with seed 
+              rng.seed(seed); // random with seed
+          } // random with seed
+    // this whole method is for random with seed 
+    void resetRNG() {
+        rng.seed(seed);
+    }
 };
 
 #endif 

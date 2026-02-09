@@ -22,7 +22,8 @@ public:
         double a, 
         double b,
         double mutation_m, 
-        const ProblemContext& ctx
+        //const ProblemContext& ctx // completely random
+        ProblemContext& ctx // random with seed
     );
 };
 
