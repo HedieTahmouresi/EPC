@@ -56,38 +56,27 @@ std::pair<double, double> EPC_Physics::computeSpiralPair(
 std::vector<double> EPC_Physics::computeNewPosition(
     const Penguin& current, const Penguin& best, 
     double mu, double a, double b, double mutation_m,
-    // const ProblemContext& ctx // completely random
-    ProblemContext& ctx // random with seed
+    ProblemContext& ctx 
 ) {
     size_t D = ctx.dimensions;
     std::vector<double> final_position(D);
+    
+    double dist = calculateDistance(current, best);
+    double Q = calculateAttraction(dist, mu);
+    
+    // double spiral_scalar = a * Q * std::cos(2.0 * M_PI * Q);
+    double spiral_scalar = a * Q * std::exp(b * (Q-1)) * std::cos(2.0 * M_PI * Q);
 
-    for (size_t i = 0; i < D - 1; i += 2) {
-        size_t j = i + 1;
-
-        std::pair<double, double> curr_pair = {current.position[i], current.position[j]};
-        std::pair<double, double> target_pair = {best.position[i], best.position[j]};
+    for (size_t d = 0; d < D; ++d) {
+        double direction_vec = best.position[d] - current.position[d];
         
-        std::pair<double, double> new_pair = computeSpiralPair(curr_pair, target_pair, mu, a, b);
-
-        final_position[i] = new_pair.first;
-        final_position[j] = new_pair.second;
+        final_position[d] = current.position[d] + (direction_vec * spiral_scalar);
     }
 
-    if (D % 2 != 0) {
-        size_t last = D - 1;
-        double dist = calculateDistance(current, best);
-        double Q = calculateAttraction(dist, mu);
-        final_position[last] = current.position[last] + Q * (best.position[last] - current.position[last]);
-    }
-
-    //std::mt19937 rng(std::random_device{}()); // completely random
     std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
 
     for (size_t d = 0; d < D; ++d) {
-        
-        //double u = dist_u(rng); // completely random
-        double u = dist_u(ctx.rng); // random with seed
+        double u = dist_u(ctx.rng);
         final_position[d] += mutation_m * u;
 
         if (final_position[d] > ctx.upperBound) final_position[d] = ctx.upperBound;
