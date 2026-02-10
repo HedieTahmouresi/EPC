@@ -31,11 +31,11 @@ struct ProblemContext {
     double upperBound;
     int maxIterations;
 
-    int numLeaders;      
-    int leaderCapacity;
-
     OptimizationMode mode;
     CostFunction costFunction;
+    
+    int numLeaders;      
+    int leaderCapacity;
 
     double spiral_a;       
     double spiral_b;       
