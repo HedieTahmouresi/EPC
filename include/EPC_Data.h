@@ -31,6 +31,9 @@ struct ProblemContext {
     double upperBound;
     int maxIterations;
 
+    int numLeaders;      
+    int leaderCapacity;
+
     OptimizationMode mode;
     CostFunction costFunction;
 
@@ -44,16 +47,16 @@ struct ProblemContext {
     std::mt19937 rng; // random with seed
 
     ProblemContext(int dim, int pop, double lb, double ub, int maxIter, 
-                   OptimizationMode m = OptimizationMode::Minimize
-                   , int rndSeed = 42 // random with seed
-                ) 
+                   OptimizationMode m = OptimizationMode::Minimize, int rndSeed = 42) 
         : dimensions(dim), populationSize(pop), 
           lowerBound(lb), upperBound(ub), maxIterations(maxIter), mode(m),
+          numLeaders(std::max(1, pop / 10)), 
+          leaderCapacity((pop / std::max(1, pop / 10)) + 2), 
           spiral_a(1.0), spiral_b(0.5), 
-          initial_mu(0.05), initial_m(0.5), cooling_factor(0.99) // {} // completely random
-          , seed(rndSeed) { // random with seed 
-              rng.seed(seed); // random with seed
-          } // random with seed
+          initial_mu(0.05), initial_m(0.5), cooling_factor(0.99),
+          seed(rndSeed) { 
+              rng.seed(seed);
+          }// random with seed
     // this whole method is for random with seed 
     void resetRNG() {
         rng.seed(seed);
