@@ -17,41 +17,9 @@ double EPC_Physics::calculateDistance(const Penguin& p1, const Penguin& p2) {
 double EPC_Physics::calculateAttraction(double distance, double mu) {
     double d = std::max(distance, 1e-10);
     double raw_attraction = (std::exp(-mu * d));
-    //if (raw_attraction > 1.0) {
-    //    return 1.0 / (1.0 + raw_attraction);
-    //} else {
-    //    return raw_attraction;
-    //}
     return raw_attraction;
 }
 
-double calculateSpiralDistance(double theta_i, double theta_j, double a, double b) {
-    double factor = (a / b) * std::sqrt(b * b + 1.0);
-    double diff = std::abs(std::exp(b * theta_j) - std::exp(b * theta_i));
-    return factor * diff;
-}
-
-std::pair<double, double> EPC_Physics::computeSpiralPair(
-    std::pair<double, double> current, 
-    std::pair<double, double> target, 
-    double mu, double a, double b
-) {
-    double theta_i = std::atan2(current.second, current.first);
-    double theta_j = std::atan2(target.second, target.first);
-
-    double dist = calculateSpiralDistance(theta_i, theta_j, a, b);
-
-    double Q = calculateAttraction(dist, mu);
-
-    double term1 = (1.0 - Q) * std::exp(b * theta_i);
-    double term2 = Q * std::exp(b * theta_j);
-    double S = term1 + term2;
-
-    double theta_k = (1.0 / b) * std::log(S);
-    double r_k = a * S;
-
-    return {r_k * std::cos(theta_k), r_k * std::sin(theta_k)};
-}
 
 std::vector<double> EPC_Physics::computeNewPosition(
     const Penguin& current, const Penguin& best, 
