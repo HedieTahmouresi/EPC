@@ -20,84 +20,49 @@ bool EPC_Optimizer::isBetter(double val1, double val2) const {
 
 void EPC_Optimizer::run() {
     std::cout << "[Optimizer] Starting Optimization..." << std::endl;
-    
+
     colony.initialize();
-
-    int groupSize = 10; 
-    int regroupPeriod = 5;
-
-    std::vector<int> indices(ctx.populationSize);
-    std::iota(indices.begin(), indices.end(), 0);
+    
 
     for (int t = 0; t < ctx.maxIterations; ++t) {
-        if (t % regroupPeriod == 0) {
-            std::shuffle(indices.begin(), indices.end(), ctx.rng);
-        }
 
         Penguin globalBest = getGlobalBest();
         std::cout << "Iter " << t << " | Global Best: " << globalBest.heat << std::endl;
 
         std::vector<Penguin>& birds = colony.getColony();
         std::vector<Penguin> next_generation = birds;
+        
 
-        for (int g = 0; g < ctx.populationSize; g += groupSize) {
-            
-            int localBestIdx = -1;
-            double localBestHeat = (ctx.mode == OptimizationMode::Minimize) ? 1e15 : -1e15;
-
-            int endIdx = std::min(g + groupSize, ctx.populationSize);
-            for (int k = g; k < endIdx; ++k) {
-                int p_idx = indices[k];
-                if (isBetter(birds[p_idx].heat, localBestHeat)) {
-                    localBestHeat = birds[p_idx].heat;
-                    localBestIdx = p_idx;
+        for (int k = 0; k < ctx.populationSize; ++k) {
+            Penguin& current = birds[k];
+            if (current.heat == globalBest.heat) {
+                std::vector<double> mutated_pos = current.position;
+                std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
+                
+                for (double& val : mutated_pos) {
+                    val += current_m * dist_u(ctx.rng);
+                    if(val > ctx.upperBound) val = ctx.upperBound;
+                    if(val < ctx.lowerBound) val = ctx.lowerBound;
                 }
+
+                if (isBetter(ctx.costFunction(mutated_pos), current.heat)) {
+                    next_generation[k].position = mutated_pos;
+                    next_generation[k].heat = ctx.costFunction(mutated_pos);
+                } else {
+                    next_generation[k] = current;
+                }
+                continue; 
             }
-            
-            Penguin& localKing = birds[localBestIdx];
-
-            for (int k = g; k < endIdx; ++k) {
-                int p_idx = indices[k];
-                Penguin& current = birds[p_idx];
-                if (current.heat == globalBest.heat) {
-                    std::vector<double> mutated_pos = current.position;
-                    std::uniform_real_distribution<double> dist_u(-1.0, 1.0);
-                    
-                    for (double& val : mutated_pos) {
-                        val += current_m * dist_u(ctx.rng);
-                        if(val > ctx.upperBound) val = ctx.upperBound;
-                        if(val < ctx.lowerBound) val = ctx.lowerBound;
-                    }
-
-                    if (isBetter(ctx.costFunction(mutated_pos), current.heat)) {
-                        next_generation[p_idx].position = mutated_pos;
-                        next_generation[p_idx].heat = ctx.costFunction(mutated_pos);
-                    } else {
-                        next_generation[p_idx] = current;
-                    }
-                    continue; 
-                }
-
-                if (p_idx == localBestIdx) {
-
-                    next_generation[p_idx].position = EPC_Physics::computeNewPosition(
-                        current, globalBest, current_mu, 
-                        ctx.spiral_a, ctx.spiral_b, 
-                        current_m, ctx
-                    );
-                    next_generation[p_idx].heat = ctx.costFunction(next_generation[p_idx].position);
-                    continue;
-                }
 
 
-                next_generation[p_idx].position = EPC_Physics::computeNewPosition(
-                    current, localKing, current_mu, 
-                    ctx.spiral_a, ctx.spiral_b, 
-                    current_m, ctx
-                );
-                next_generation[p_idx].heat = ctx.costFunction(next_generation[p_idx].position);
-            }
+            next_generation[k].position = EPC_Physics::computeNewPosition(
+                current, globalBest, current_mu, 
+                ctx.spiral_a, ctx.spiral_b, 
+                current_m, ctx
+            );
+            next_generation[k].heat = ctx.costFunction(next_generation[k].position);
         }
+        
 
         birds = next_generation;
 
