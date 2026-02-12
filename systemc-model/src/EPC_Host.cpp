@@ -63,6 +63,7 @@ void EPC_Host::sort_population() {
 
     if (new_best_found) {
         global_best = population[0];
+        o_best_cost.write(global_best.cost);
     }
 }
 
@@ -78,9 +79,6 @@ void EPC_Host::run_thread() {
     std::iota(sorted_indices.begin(), sorted_indices.end(), 0);
 
     std::vector<int> assignments(population_size, -1);
-
-    std::cout << "[Host] Leaders: " << num_leaders 
-              << " | Capacity: " << leader_capacity << std::endl;
 
     for (int t = 0; t < max_iterations; ++t) {
         
@@ -193,13 +191,21 @@ void EPC_Host::run_thread() {
             }
         }
 
+        double worst_cost = population[sorted_indices[population_size - 1]].cost;
+        double best_cost = population[sorted_indices[0]].cost;
+        double diversity = std::abs(worst_cost - best_cost);
+
+        if (diversity < 1e-4) {
+            current_m = 0.5; 
+        } else {
+            current_m *= m_decay;
+        }
+        
         current_mu *= cooling_factor;
-        current_m *= m_decay;
+
 
         o_iter.write(t);
         o_best_cost.write(global_best.cost);
     }
-    
-    std::cout << "[Host] Final Best: " << global_best.cost << std::endl;
-    sc_stop();
+    o_done.write(true);
 }

@@ -7,14 +7,45 @@
 
 int sc_main(int argc, char* argv[]) {
     const int POPULATION_SIZE = 20;
-    const int DIMENSIONS = 10;
-    const int MAX_ITERATIONS = 200;  
+    const int DIMENSIONS = 20; //10;
+    const int MAX_ITERATIONS = 2000;  
     
     const double LOWER_BOUND = -5.12;
     const double UPPER_BOUND = 5.12;
     
-    const CostFunctionID BENCHMARK = FUNC_ROSENBROCK;
-    const OptimizationMode MODE = Minimize;
+    const CostFunctionID BENCHMARK = FUNC_SPHERE;
+    const OptimizationMode MODE = Minimize; //Maximize;
+
+    // const int POPULATION_SIZE = 20;
+    // const int DIMENSIONS = 10;
+    // const int MAX_ITERATIONS = 2000;  
+    
+    // const double LOWER_BOUND = -5.12;
+    // const double UPPER_BOUND = 5.12;
+    
+    // const CostFunctionID BENCHMARK = FUNC_ROSENBROCK;
+    // const OptimizationMode MODE = Minimize;
+
+    
+    // const int POPULATION_SIZE = 20;
+    // const int DIMENSIONS = 15;
+    // const int MAX_ITERATIONS = 100;  
+    
+    // const double LOWER_BOUND = -10.0;
+    // const double UPPER_BOUND = 10.0;
+    
+    // const CostFunctionID BENCHMARK = FUNC_RASTRIGIN;
+    // const OptimizationMode MODE = Maximize;
+
+    // const int POPULATION_SIZE = 20;
+    // const int DIMENSIONS = 15;
+    // const int MAX_ITERATIONS = 500;  
+    
+    // const double LOWER_BOUND = -10.0;
+    // const double UPPER_BOUND = 10.0;
+    
+    // const CostFunctionID BENCHMARK = FUNC_ACKLEY;
+    // const OptimizationMode MODE = Minimize;
 
     sc_fifo<Update_Job>      bus_host_to_acc("BUS_H2A", 128); 
     sc_fifo<Penguin_Packet>  bus_acc_to_host("BUS_A2H", 128);
